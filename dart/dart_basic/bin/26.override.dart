@@ -1,41 +1,28 @@
-class TimeTwo{
+class TimesTwo {
   final int num;
-  TimeTwo(this.num);
+  TimesTwo(this.num);
 
-  int calculate(){
-    return num*2;
-  }
+  int calculate() => num * 2;
 }
-class TimeThree extends TimeTwo{
-  // TimeThree(int num) : super(num);
-  TimeThree(super.num);
+class TimeFour extends TimesTwo {
+  // TimeFour(int num) : super(num);
+  TimeFour(super.num);
 
   @override
-  int calculate(){
-    // 1. 부모의 num 값 호출
-    // return super.num*5;
+  int calculate() {
+    // 1. 부모의 num값 호출
+    // return super.num * 4;
+    // return this.num * 4;  // 나의 클래스에도 num이 있기 때문에 사용 가능
 
-    // 2. 부모의 메소드 호출
-    return super.calculate()*2;
+    // 2. 부모의 메소드를 불러와서 사용
+    return super.calculate() * 2;
   }
 }
 
-class Employee {
-  static String? building; // static 붙은건 null 값 들어갈 수 있기에 변환
-  String name;
+void main() {
+  TimesTwo tt = TimesTwo(2);
+  print(tt.calculate());
 
-  Employee(this.name);
-
-  void printName(){
-    print('제 이름은 $name 입니다. $building 에서 근무하고 있습니다.');
-  }
-  static void printBuilding(){
-    // print('제 이름은 $name 입니다. $building 에서 근무하고 있습니다.');
-    // 전역에서 사용할 수 있어야하는데 name 이라는 지역변수가 있어서
-
-    print('$building 에서 근무하고 있습니다.');
-    // 전역변수 전역함수
-  }
-
+  TimeFour tf = TimeFour(2);
+  print(tf.calculate());
 }
-
