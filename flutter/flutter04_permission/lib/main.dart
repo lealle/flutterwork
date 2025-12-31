@@ -18,23 +18,25 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // 권한 얻어오기
   getPermission() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
+    var status = await Permission.contacts.status;
+    if(status.isGranted) {
+      print('허락됨');
+      List<Contact> contacts = await FlutterContacts.getContacts(withProperties: true);
+      setState(() {
+        name = contacts;
+      });
+    } else if(status.isDenied) {
       print('거절됨');
-      return;
+      Permission.contacts.request();
+    } else if(status.isPermanentlyDenied) {
+      print('영구 거절됨. 설정에서 직접 설정');
+      openAppSettings();
     }
-    print('허락됨');
-    List<Contact> contacts = await FlutterContacts.getContacts(
-        withProperties: true);
-    setState(() {
-      name = contacts;
-    });
   }
 
-  var name = [];    // List<dynamic> 타입이 됨
+  List<Contact> name = [];    // List<dynamic> 타입이 됨
 
-  // 1. 함수 추가
   addName() async {
     var contacts = await FlutterContacts.getContacts(withProperties: true);
     setState(() {
@@ -51,7 +53,6 @@ class _MyAppState extends State<MyApp> {
           showDialog(
               context: context,
               builder: (context) {
-                // 2. 넘겨주기
                 return CustomDialog(addName : addName);
               }
           );
@@ -71,7 +72,7 @@ class _MyAppState extends State<MyApp> {
           return ListTile(
             // leading: Image.asset('assets/user${index+1}.png'),
             title: Text(name[index].displayName ?? '이름없음'),
-            subtitle: Text(name[index].phones.isNotEmpty ? name[index].phones[0].number : '번호없음'),
+            subtitle: Text(name[index].phones.isNotEmpty ? name[index].phones[0].number : '전화번호 없음'),
           );
         },
       ),
@@ -96,15 +97,11 @@ class CustomDialog extends StatelessWidget {
           children: [
             TextField(controller: inputData,),
             TextButton(onPressed: () async {
-              try {
-                var newContact = Contact();
-                newContact.name.first = inputData.text;
-                await newContact.insert(); // 핸드폰의 주소록에 넣기
-                await addName();
-                Navigator.pop(context);
-              } catch(e) {
-                print('등록 실패');
-              }
+              var newContact = Contact();
+              newContact.name.first = inputData.text;
+              await newContact.insert(); // 핸드폰의 주소록에 넣기
+              await addName();
+              Navigator.pop(context);
             }, child: Text('완료')),
             TextButton(onPressed: (){ Navigator.pop(context); }, child: Text('취소'))
           ],
